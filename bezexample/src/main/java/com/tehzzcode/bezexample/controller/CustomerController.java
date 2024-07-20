@@ -26,17 +26,24 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping("/customers")
-    public ResponseEntity<List<Customer>> getAllCustomers(@RequestParam(required = false) String name) {
+    public ResponseEntity<DefaultResponseDto> getAllCustomers(@RequestParam(required = false) String name) {
+        DefaultResponseDto response = new DefaultResponseDto();
         List<Customer> customers = new ArrayList<Customer>();
+        response.setStatusCode("00");
 
         try {
-            if (name == null)
+            if (name == null) {
                 customers.addAll(customerService.getAllCustomers());
-            else
+                response.setMessage(customers.size() + " customers successfully fetched");
+            } else {
                 customers.addAll(customerService.getAllCustomersByName(name));
-
-            return new ResponseEntity<>(customers, HttpStatus.OK);
+                response.setMessage(customers.size() + " customers with the name: " + name + ", successfully fetched");
+            }
+            response.setData(customers);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
+            response.setStatusCode("99");
+            response.setMessage( "Sorry something went wrong");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -59,55 +66,72 @@ public class CustomerController {
     }
 
     @GetMapping("/customers/{id}")
-    public ResponseEntity<Customer> getCustomerById(@PathVariable("id") long id) {
+    public ResponseEntity<DefaultResponseDto> getCustomerById(@PathVariable("id") long id) {
+        DefaultResponseDto response = new DefaultResponseDto();
+        response.setStatusCode("00");
 
         try {
             Optional<Customer> customer = customerService.getCustomerById(id);
             if (customer.isPresent()) {
-                return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+                response.setMessage("Customer with id: " + id + " successfully fetched");
+                response.setData(customer.get());
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                response.setStatusCode("99");
+                response.setMessage("Customer with id: " + id + " not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode("99");
+            response.setMessage("Sorry something went wrong");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/customers/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") long id,
+    public ResponseEntity<DefaultResponseDto> updateCustomer(@PathVariable("id") long id,
                                                    @Valid @RequestBody CustomerDto customerDto) {
+        DefaultResponseDto response = new DefaultResponseDto();
+        response.setStatusCode("00");
+
         try {
             Optional<Customer> customer = customerService.updateCustomerById(id, customerDto);
             if (customer.isPresent()) {
-                return new ResponseEntity<>(customer.get(), HttpStatus.OK);
+                response.setMessage("Customer with id: " + id + " successfully updated");
+                response.setData(customer.get());
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                response.setStatusCode("99");
+                response.setMessage("Customer with id: " + id + " not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode("99");
+            response.setMessage("Sorry something went wrong");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/customers/{id}")
-    public ResponseEntity<HttpStatus> deleteCustomer(@PathVariable("id") long id) {
+    public ResponseEntity<DefaultResponseDto> deleteCustomer(@PathVariable("id") long id) {
+        DefaultResponseDto response = new DefaultResponseDto();
+        response.setStatusCode("00");
 
         try {
             Optional<Customer> customer = customerService.getCustomerById(id);
             if (customer.isPresent()) {
                 customerService.deleteCustomerById(id);
-                return new ResponseEntity<>(HttpStatus.OK);
+                response.setMessage("Customer with id: " + id + " successfully deleted");
+                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                response.setStatusCode("99");
+                response.setMessage("Customer with id: " + id + " not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode("99");
+            response.setMessage("Sorry something went wrong");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    /*
-    step 1: pass in the parameter of id into the deleteCustomerById method in the customerService class
-    step 2: in the deleteCustomerById method the id parameter is then passed to the deleteCustomerById customerRepository class
-    step 3: in the
-    step : now assign the result of the customerService class to a customer variable
-
-     */
 }
