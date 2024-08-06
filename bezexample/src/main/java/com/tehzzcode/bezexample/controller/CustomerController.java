@@ -4,7 +4,7 @@ import com.tehzzcode.bezexample.entities.Customer;
 import com.tehzzcode.bezexample.payload.CustomerDto;
 import com.tehzzcode.bezexample.payload.DefaultResponseDto;
 import com.tehzzcode.bezexample.repository.CustomerRepository;
-import com.tehzzcode.bezexample.service.CustomerService;
+import com.tehzzcode.bezexample.service.CustomerServize;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class CustomerController {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerServize customerService;
 
     @GetMapping("/customers")
     public ResponseEntity<DefaultResponseDto> getAllCustomers(@RequestParam(required = false) String name) {
@@ -48,22 +48,22 @@ public class CustomerController {
         }
     }
 
-    @PostMapping("/customers")
-    public ResponseEntity<DefaultResponseDto> createCustomer(@Valid @RequestBody CustomerDto customerDto) {
-        DefaultResponseDto response = new DefaultResponseDto();
-        response.setStatusCode("00");
-
-        try {
-            Customer customer = customerService.saveCustomer(customerDto);
-            response.setMessage("Customer created successfully with id: " + customer.getId());
-            response.setData(customer);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            response.setStatusCode("99");
-            response.setMessage("Sorry something went wrong");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PostMapping("/customers")
+//    public ResponseEntity<DefaultResponseDto> createCustomer(@Valid @RequestBody CustomerDto customerDto) {
+//        DefaultResponseDto response = new DefaultResponseDto();
+//        response.setStatusCode("00");
+//
+//        try {
+//            Customer customer = customerService.saveCustomer(customerDto);
+//            response.setMessage("Customer created successfully with id: " + customer.getId());
+//            response.setData(customer);
+//            return new ResponseEntity<>(response, HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            response.setStatusCode("99");
+//            response.setMessage("Sorry something went wrong");
+//            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     @GetMapping("/customers/{id}")
     public ResponseEntity<DefaultResponseDto> getCustomerById(@PathVariable("id") long id) {

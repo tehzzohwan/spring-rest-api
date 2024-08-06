@@ -16,4 +16,6 @@ public class CustomerDto {
     @NotNull(message = "The age is required.")
     @Min(value = 18, message = "The age must be equal or greater than 18")
     private int age;
+
+
 }
